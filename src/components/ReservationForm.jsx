@@ -22,6 +22,21 @@ class ReservationForm extends Component {
     },
   }
 
+  handleChange = (propertyToSet, value) => {
+    this.setState({
+      reservation: {
+        ...this.state.reservation,
+        [propertyToSet]: value,
+      },
+      // the problem comes from the fact that object properties
+      // cannot take directly their names out of function parameters :(
+      // in order to use a variable/argument/constant as a property name in an
+      // object, you need to EVALUATE that variable/argument/constant!
+      // put it into []! that will take the value of your argument (not its name)
+      // and use it as the property name
+    })
+  }
+
   render() {
     return (
       <div className="my-2 text-center">
@@ -36,23 +51,59 @@ class ReservationForm extends Component {
               // now from here we also need to CHANGE the value of name in the state!
               onChange={(e) => {
                 // console.log('ciao!')
-                this.setState({
-                  reservation: {
-                    name: e.target.value, // this is carrying the character pressed!
-                  },
-                })
+                // this.setState({
+                //   // setState merges the object you're passing to it
+                //   // into the current state (it's a MERGING process)
+                //   reservation: {
+                //     // here I'm just assigning an object with ONE property!
+                //     ...this.state.reservation,
+                //     name: e.target.value, // this is carrying the character pressed!
+                //   },
+                // })
+                this.handleChange('name', e.target.value)
               }}
             />
           </Form.Group>
 
           <Form.Group>
             <Form.Label>What's your phone?</Form.Label>
-            <Form.Control type="tel" placeholder="Insert your phone here" />
+            <Form.Control
+              type="tel"
+              placeholder="Insert your phone here"
+              value={this.state.reservation.phone}
+              onChange={(e) => {
+                // this.setState({
+                //   reservation: {
+                //     // I'd like to remember also the OTHER existing values!
+                //     // I have to set the new reservation object starting from
+                //     // what I already have! otherwise I'm losing all the other properties (name, numberOfPeople etc.)
+                //     ...this.state.reservation,
+                //     // the spread operator ... is taking into here
+                //     // all the existing pairs of key/value from the object
+                //     // I'm spreading
+                //     phone: e.target.value,
+                //   },
+                // })
+                this.handleChange('phone', e.target.value)
+              }}
+            />
           </Form.Group>
 
           <Form.Group>
             <Form.Label>How many are you?</Form.Label>
-            <Form.Control as="select">
+            <Form.Control
+              as="select"
+              value={this.state.reservation.numberOfPeople}
+              onChange={(e) => {
+                // this.setState({
+                //   reservation: {
+                //     ...this.state.reservation,
+                //     numberOfPeople: e.target.value,
+                //   },
+                // })
+                this.handleChange('numberOfPeople', e.target.value)
+              }}
+            >
               <option>1</option>
               <option>2</option>
               <option>3</option>
@@ -64,16 +115,45 @@ class ReservationForm extends Component {
 
           <Form.Group>
             <Form.Label>When are you coming?</Form.Label>
-            <Form.Control type="datetime-local" />
+            <Form.Control
+              type="datetime-local"
+              value={this.state.reservation.dateTime}
+              onChange={(e) => {
+                // this.setState({
+                //   reservation: {
+                //     ...this.state.reservation,
+                //     dateTime: e.target.value,
+                //   },
+                // })
+                this.handleChange('dateTime', e.target.value)
+              }}
+            />
           </Form.Group>
 
           <Form.Group>
-            <Form.Check type="checkbox" label="Do you smoke?" />
+            <Form.Check
+              type="checkbox"
+              label="Do you smoke?"
+              // the "value" property in checkboxes is NOT true/false!
+              // in order to take true/false as a value from a checkbox
+              // we need to read another property: 'checked'
+              checked={this.state.reservation.smoking}
+              onChange={(e) => {
+                this.handleChange('smoking', e.target.checked)
+              }}
+            />
           </Form.Group>
 
           <Form.Group>
             <Form.Label>Any special request?</Form.Label>
-            <Form.Control as="textarea" rows={3} />
+            <Form.Control
+              as="textarea"
+              rows={3}
+              value={this.state.reservation.specialRequests}
+              onChange={(e) => {
+                this.handleChange('specialRequests', e.target.value)
+              }}
+            />
           </Form.Group>
 
           <Button variant="info" type="submit">
