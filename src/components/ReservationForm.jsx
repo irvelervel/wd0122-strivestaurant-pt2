@@ -37,11 +37,72 @@ class ReservationForm extends Component {
     })
   }
 
+  handleSubmit = async (e) => {
+    // e is the form submission event, your function gets it automatically!
+    e.preventDefault()
+    // preventDefault() will STOP the default behavior of your browser!
+    // let's collect all the values from the form!
+    // ...just kidding, we have already all the values in the state! :)
+    // all the values are already safely stored in this.state.reservation
+
+    // how to deal with Promises? 2 ways:
+    // 1) chained .then method
+    // fetch('https://striveschool-api.herokuapp.com/api/reservation', {
+    //   method: 'POST',
+    //   body: JSON.stringify(this.state.reservation),
+    //   headers: {
+    //     'Content-type': 'application/json',
+    //   },
+    // })
+    //   .then((response) => {
+    //     console.log('job done!')
+    //     console.log(response)
+    //   })
+    //   .catch((error) => {
+    //     console.log(error)
+    //   })
+    // 2) async/await
+    try {
+      const response = await fetch(
+        'https://striveschool-api.herokuapp.com/api/reservation',
+        {
+          method: 'POST',
+          body: JSON.stringify(this.state.reservation),
+          headers: {
+            'Content-type': 'application/json',
+          },
+        }
+      )
+      console.log('job done!')
+      console.log(response)
+      if (response.ok) {
+        // this property tells us the outcome of the network call
+        alert('reservation saved!')
+        this.setState({
+          reservation: {
+            name: '',
+            phone: '',
+            numberOfPeople: 1,
+            dateTime: '',
+            smoking: false,
+            specialRequests: '',
+          },
+        })
+      } else {
+        alert('something went wrong with the operation')
+      }
+    } catch (error) {
+      console.log(error)
+      // this means most likely your internet connection has a problem
+      // ...because you never reached the server in the first place!
+    }
+  }
+
   render() {
     return (
       <div className="my-2 text-center">
         <h2>Book your table here!</h2>
-        <Form>
+        <Form onSubmit={this.handleSubmit}>
           <Form.Group>
             <Form.Label>What's your name?</Form.Label>
             <Form.Control
